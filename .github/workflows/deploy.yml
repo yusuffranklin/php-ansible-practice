@@ -28,3 +28,12 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
           ansible-playbook --private-key private_key.pem -u root -i inventories/reverse-proxy/inventory.yaml playbooks/reverse-proxy-playbook.yaml
+
+      - name: Ansible Playbook to App Server
+        working-directory: ./ansible
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+          ansible-playbook --private-key private_key.pem -u root -i inventories/app-server/inventory.yaml playbooks/app-server-playbook.yaml
