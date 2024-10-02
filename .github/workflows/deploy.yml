@@ -30,10 +30,8 @@ jobs:
       - name: Ansible Playbook to Reverse Proxy Server
         working-directory: ./ansible
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          privatekey: ${{ vars.SSH_PRIVATE_KEY }}
         run: |
-          apk update && apk add curl -y
-          privatekey=$(curl -s $SSH_PRIVATE_KEY)
           echo $privatekey > private.key
           chmod 600 private.key
           ansible-playbook --private-key private.key -i inventories/reverse-proxy/inventory.yaml playbooks/reverse-proxy-playbook.yaml
