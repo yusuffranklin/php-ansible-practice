@@ -29,6 +29,8 @@ jobs:
       # Change directory to terraform manifests
       - name: Ansible Playbook to Reverse Proxy Server
         working-directory: ./ansible
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           echo $SSH_PRIVATE_KEY > private.key
           cat private.key
