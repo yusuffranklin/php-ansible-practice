@@ -32,6 +32,6 @@ jobs:
         env:
           privatekey: ${{ vars.SSH_PRIVATE_KEY }}
         run: |
-          echo $privatekey > private.key
-          chmod 600 private.key
-          ansible-playbook --private-key private.key -i inventories/reverse-proxy/inventory.yaml playbooks/reverse-proxy-playbook.yaml
+          echo $privatekey
+          # chmod 600 private.key
+          # ansible-playbook --private-key private.key -i inventories/reverse-proxy/inventory.yaml playbooks/reverse-proxy-playbook.yaml
