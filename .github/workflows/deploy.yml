@@ -13,25 +13,18 @@ jobs:
     name: 'Deploy'
     runs-on: ubuntu-latest
     environment: production
-
-    # # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
-    # defaults:
-    #   run:
-    #     shell: bash
     container:
       image: yusuffranklin/ansible:alpine
 
     steps:
-      # Checkout the repository to the GitHub Actions runner
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Change directory to terraform manifests
       - name: Ansible Playbook to Reverse Proxy Server
         working-directory: ./ansible
         env:
-          privatekey: ${{ vars.SSH_PRIVATE_KEY }}
+          ANSIBLE_HOST_KEY_CHECKING: False
         run: |
-          echo $privatekey
-          # chmod 600 private.key
-          # ansible-playbook --private-key private.key -i inventories/reverse-proxy/inventory.yaml playbooks/reverse-proxy-playbook.yaml
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+          ansible-playbook --private-key private_key.pem -u root -i inventories/reverse-proxy/inventory.yaml playbooks/reverse-proxy-playbook.yaml
