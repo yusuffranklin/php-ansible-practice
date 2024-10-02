@@ -1,0 +1,7 @@
+all:
+  hosts:
+    reverse-proxy:
+      ansible_host: 
+  vars:
+    nginx_server_name: "_"
+    remove_default_nginx_vhost: true
