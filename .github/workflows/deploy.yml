@@ -19,7 +19,7 @@ jobs:
     #   run:
     #     shell: bash
     container:
-      image: ansible/ansible:ubuntu1604py3
+      image: yusuffranklin/ansible:alpine
 
     steps:
       # Checkout the repository to the GitHub Actions runner
