@@ -33,6 +33,5 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           echo $SSH_PRIVATE_KEY > private.key
-          cat private.key
           chmod 600 private.key
-          # ansible-playbook --private-key private.key -i inventories/reverse-proxy/inventory.yaml playbooks/reverse-proxy-playbook.yaml
+          ansible-playbook --private-key private.key -i inventories/reverse-proxy/inventory.yaml playbooks/reverse-proxy-playbook.yaml
