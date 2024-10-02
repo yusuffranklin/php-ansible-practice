@@ -2,11 +2,6 @@
 - name: Create a directory on the remote server
   hosts: all
   become: yes
-  vars:
-    app_path: /apps/{{ repo_name }}/{{ app_version }}
-    artifact_path: /tmp/{{ repo_name }}-{{ app_version }}.tar.gz
-    gcp_service_account_path: /tmp/gcp-service-account.json
-    vault_token: "{{ lookup('env', 'VAULT_TOKEN') }}"
   tasks:
     - name: Add Ondrej PHP repository
       ansible.builtin.apt_repository:
@@ -28,129 +23,17 @@
           - php7.4-mbstring
           - php7.4-curl
           - php7.4-dom
-          - php7.4-redis
           - php7.4-xmlrpc
           - php7.4-gd
-          - nfs-common
-          - python3-pip
         state: present
 
-    - name: Ensure the directory {{ app_path }} exists
-      file:
-        path: "{{ app_path }}"
-        state: directory
-        mode: "775"
-        recurse: true
-
-    - name: Install google-cloud-storage package
-      ansible.builtin.pip:
-        name:
-          - google-cloud-storage
-          - hvac
-          - requests
-        state: present
-        executable: pip3
-        extra_args: --break-system-packages
-
-    - name: Fetch secret from HashiCorp Vault
-      community.hashi_vault.vault_read:
-        url: "https://vault.komerce.id:8200"
-        token: "{{ vault_token }}"
-        path: "kv/data/production/infrastructure/ansible"
-      register: gcp_service_account
-
-    - name: Create gcp service account file from vault
-      copy:
-        dest: "/tmp/gcp-service-account.json"
-        content: |
-          {{ gcp_service_account.data.data.data.gcp_service_account }}
-
-    - name: Download an object
-      google.cloud.gcp_storage_object:
-        action: download
-        bucket: komerce-devops
-        src: "artifacts/{{ namespace }}/{{ repo_name }}/{{ app_version }}.tar.gz"
-        dest: "{{ artifact_path }}"
-        auth_kind: serviceaccount
-        service_account_file: "{{ gcp_service_account_path }}"
-
-    - name: Extract the .tar.gz file
-      unarchive:
-        src: "{{ artifact_path }}"
-        dest: "{{ app_path }}/"
-        remote_src: yes
-
-    - name: Set ownership of {{ app_path }}/storage
-      ansible.builtin.file:
-        path: "{{ app_path }}/storage"
-        owner: www-data
-        group: www-data
-        mode: "774"
-
-    - name: Fetch secret from HashiCorp Vault
-      community.hashi_vault.vault_read:
-        url: "https://vault.komerce.id:8200"
-        token: "{{ vault_token }}"
-        path: "kv/data/{{ app_environment }}/services/{{ namespace }}/{{ repo_name }}"
-      register: vault_secrets
-
-    - name: Create env file from secrets
-      copy:
-        dest: "{{ app_path }}/.env"
-        content: |
-          {% for key, value in vault_secrets.data.data.data.items() %}
-          {{ key }}="{{ value }}"
-          {% endfor %}
-
-    - name: Fetch files from HashiCorp Vault
-      community.hashi_vault.vault_read:
-        url: "https://vault.komerce.id:8200"
-        token: "{{ vault_token }}"
-        path: "kv/data/{{ app_environment }}/files/{{ namespace }}/{{ repo_name }}"
-      register: files
-      when: mount_files is defined
-
-    - name: Create fetched files from vault
-      copy:
-        dest: "{{ app_path }}/{{ item.dest }}"
-        content: |
-          {{ files.data.data.data[item.source] }}
-      loop: "{{ mount_files }}"
-      when: mount_files is defined
-
-    - name: Mount an NFS volume
-      ansible.posix.mount:
-        src: 10.184.0.127:/data/{{ app_environment }}/{{ repo_name }}/{{ item.remote_path }}
-        path: "{{ app_path }}/{{ item.local_path }}"
-        opts: rw,sync,hard
-        state: mounted
-        fstype: nfs
-      loop: "{{ mount_nfs }}"
-      when: mount_nfs is defined
-
-    - name: Set ownership of NFS volume
-      ansible.builtin.file:
-        path: "{{ app_path }}/{{ item.local_path }}"
-        owner: www-data
-        group: www-data
-        mode: "775"
-      loop: "{{ mount_nfs }}"
-      when: mount_nfs is defined
-
-    - name: Create a symbolic link
-      ansible.builtin.file:
-        src: "{{ app_path }}/storage/app/public"
-        dest: "{{ app_path }}/public/storage"
-        owner: www-data
-        group: www-data
-        state: link
-
-    - name: Change permission of symbolic link
-      ansible.builtin.file:
-        path: "{{ app_path }}/public/storage"
-        owner: www-data
-        group: www-data
-        mode: "775"
+    - name: Clone a repository
+      tasks:
+        - name: Clone the private Git repository
+          git:
+            repo: "https://github.com/yusuffranklin/divistant-technical-test.git"
+            dest: "/var/www/html/divistant-technical-test"
+            version: "main"
 
     - name: Create Nginx vhost
       template:
@@ -167,11 +50,3 @@
       service:
         name: nginx
         state: reloaded
-
-    - name: Cleanup files
-      file:
-        path: "{{ item }}"
-        state: absent
-      with_items:
-        - "{{ gcp_service_account_path }}"
-        - "{{ artifact_path }}"

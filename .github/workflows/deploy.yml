@@ -1,4 +1,4 @@
-name: 'Terraform'
+name: 'Deploy'
 
 on:
   push:
@@ -9,8 +9,8 @@ permissions:
   contents: read
 
 jobs:
-  terraform:
-    name: 'Terraform'
+  deploy:
+    name: 'Deploy'
     runs-on: ubuntu-latest
     environment: production
 
@@ -19,18 +19,19 @@ jobs:
     #   run:
     #     shell: bash
     container:
-      image: hashicorp/terraform:1.7.0
+      image: ansible/ansible:ubuntu1604py3
 
     steps:
       # Checkout the repository to the GitHub Actions runner
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Change directory to terraform manifests
+      - name: Change Directory
+        run: cd ansible
+
       - name: Debug directory location
         run: pwd
-      # Change directory to terraform manifests
-      # - name: Change Directory
-      #   run: cd terraform
       
       # # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       # - name: Terraform Init

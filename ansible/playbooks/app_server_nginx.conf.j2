@@ -1,11 +1,9 @@
 server {
 	listen 80;
 
-	root /var/www/html/app;
+	root /var/www/html/divistant-technical-test/app;
 
 	index index.php index.html;
-
-	server_name {{ nginx_server_name }};
 
 	location / {
 		try_files $uri $uri/ /index.php?$query_string;
