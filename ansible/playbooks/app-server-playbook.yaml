@@ -37,8 +37,8 @@
 
     - name: Create Nginx vhost
       template:
-        src: "nginx_vhost.conf.j2"
-        dest: "/etc/nginx/sites-enabled/{{ repo_name }}.conf"
+        src: "app_server_nginx.conf"
+        dest: "/etc/nginx/sites-enabled/app_server.conf"
 
     - name: Delete default Nginx vhost
       file:

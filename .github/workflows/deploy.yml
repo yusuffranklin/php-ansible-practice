@@ -31,4 +31,5 @@ jobs:
         working-directory: ./ansible
         run: |
           echo $SSH_PRIVATE_KEY > private.key
+          chmod 600 private.key
           ansible-playbook --private-key private.key -i inventories/reverse-proxy/inventory.yaml playbooks/reverse-proxy-playbook.yaml

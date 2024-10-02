@@ -11,7 +11,7 @@
 
     - name: Create Nginx vhost
       template:
-        src: "reverse_proxy_nginx.conf.j2"
+        src: "reverse_proxy_nginx.conf"
         dest: "/etc/nginx/sites-enabled/app_server.conf"
 
     - name: Delete default Nginx vhost
