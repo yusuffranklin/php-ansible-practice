@@ -1,30 +1,16 @@
 <?php
-// database connection code
-if(isset($_POST['txtName']))
-{
-// $con = mysqli_connect('localhost', 'database_user', 'database_password','database');
-$con = mysqli_connect('192.168.0.4', 'root', '','db_contact');
+$servername = "192.168.0.4:3306"; // Replace with your MySQL server hostname
+$username = "root";        // Replace with your MySQL username
+$password = "";            // Replace with your MySQL password
+$dbname = "test_db";       // Replace with your MySQL database name
 
-// get the post records
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-$txtName = $_POST['txtName'];
-$txtEmail = $_POST['txtEmail'];
-$txtPhone = $_POST['txtPhone'];
-$txtMessage = $_POST['txtMessage'];
-
-// database insert SQL code
-$sql = "INSERT INTO `tbl_contact` (`Id`, `fldName`, `fldEmail`, `fldPhone`, `fldMessage`) VALUES ('0', '$txtName', '$txtEmail', '$txtPhone', '$txtMessage')";
-
-// insert in database 
-$rs = mysqli_query($con, $sql);
-if($rs)
-{
-	echo "Contact Records Inserted";
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
-}
-else
-{
-	echo "Are you a genuine visitor?";
-	
-}
+echo "Successfully connected to the MySQL database!";
+$conn->close();
 ?>

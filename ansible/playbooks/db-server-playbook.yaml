@@ -1,0 +1,38 @@
+---
+- name: Playbook for DB Server
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update Apt
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install MySQL Server
+      ansible.builtin.apt:
+        name:
+          - mysql-server
+        state: present
+
+    - name: Start MySQL
+      ansible.builtin.service:
+        name: mysql
+        state: started
+
+    - name: Enable MySQL
+      ansible.builtin.service:
+        name: mysql
+        state: enabled
+
+    - name: Replace IP Address
+      ansible.builtin.lineinfile:
+        path: /etc/mysql/mysql.conf.d/mysqld.cnf
+        search_string: '127.0.0.1'
+        line: 192.168.0.2
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart MySQL
+      ansible.builtin.service:
+        name: mysql
+        state: restarted

@@ -1,5 +1,5 @@
 ---
-- name: Create a directory on the remote server
+- name: Playbook for Reverse Proxy Server
   hosts: all
   become: yes
   tasks:

@@ -1,6 +1,6 @@
 all:
   hosts:
     app-server:
-      ansible_host: 178.128.93.219
+      ansible_host: 178.128.94.153
   vars:
     remove_default_nginx_vhost: true

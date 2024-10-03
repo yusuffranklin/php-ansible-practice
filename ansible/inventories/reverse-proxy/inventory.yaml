@@ -1,6 +1,6 @@
 all:
   hosts:
     reverse-proxy:
-      ansible_host: 178.128.30.200
+      ansible_host: 178.128.91.185
   vars:
     remove_default_nginx_vhost: true

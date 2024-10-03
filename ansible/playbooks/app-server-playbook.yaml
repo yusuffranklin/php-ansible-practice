@@ -1,5 +1,5 @@
 ---
-- name: Create a directory on the remote server
+- name: Playbook for App Server
   hosts: all
   become: yes
   tasks:
@@ -26,12 +26,6 @@
           - php7.4-xmlrpc
           - php7.4-gd
         state: present
-      
-    - name: Clone the private Git repository
-      git:
-        repo: "https://github.com/yusuffranklin/divistant-technical-test.git"
-        dest: "/var/www/html/divistant-technical-test"
-        version: "main"
 
     - name: Create Nginx vhost
       template:
