@@ -71,7 +71,7 @@
         state: directory
       loop:
         - /root/scripts
-        - /root/backup
+        - /backup
 
     - name: Create Backup Script
       ansible.builtin.copy:
