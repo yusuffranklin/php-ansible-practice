@@ -46,3 +46,12 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
           ansible-playbook --private-key private_key.pem -u root -i inventories/db-server/inventory.yaml playbooks/db-server-playbook.yaml
+      
+      - name: Ansible Playbook to Monitoring Server
+        working-directory: ./ansible
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+          ansible-playbook --private-key private_key.pem -u root -i inventories/monitoring-server/inventory.yaml playbooks/monitoring-server-playbook.yaml

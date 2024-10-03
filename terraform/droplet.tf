@@ -24,3 +24,12 @@ resource "digitalocean_droplet" "db_server" {
   ssh_keys = [43571840]
   vpc_uuid = digitalocean_vpc.vpc.id
 }
+
+resource "digitalocean_droplet" "monitoring_server" {
+  image  = "ubuntu-24-04-x64"
+  name   = "monitoring-server"
+  region = "sgp1"
+  size   = "s-1vcpu-1gb"
+  ssh_keys = [43571840]
+  vpc_uuid = digitalocean_vpc.vpc.id
+}

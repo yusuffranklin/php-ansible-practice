@@ -7,10 +7,11 @@
       ansible.builtin.apt:
         update_cache: yes
 
-    - name: Install MySQL Server
+    - name: Install MySQL Server and Prometheus Node Exporter
       ansible.builtin.apt:
         name:
           - mysql-server
+          - prometheus-node-exporter
         state: present
 
     - name: Start MySQL
@@ -23,16 +24,31 @@
         name: mysql
         enabled: yes
 
-    - name: Replace Bind IP Address
-      ansible.builtin.lineinfile:
-        path: /etc/mysql/mysql.conf.d/mysqld.cnf
-        regexp: '^127\.0\.0\.1'
-        line: 192.168.0.2
+    - name: Create MySQL Configuration
+      ansible.builtin.copy:
+        src: "mysqld.cnf"
+        dest: "/etc/mysql/mysql.conf.d/mysqld.cnf"
         owner: root
         group: root
-        mode: '0644'
+        mode: 0744
 
     - name: Restart MySQL
       ansible.builtin.service:
         name: mysql
         state: restarted
+
+    - name: Create Script and Backup Folder
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - /root/scripts
+        - /root/backup
+
+    - name: Create Backup Script
+      ansible.builtin.copy:
+        src: "backup-db.sh"
+        dest: "/root/scripts/backup-db.sh"
+        owner: root
+        group: root
+        mode: 0755

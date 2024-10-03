@@ -13,7 +13,7 @@
         update_cache: yes
         cache_valid_time: 3600
 
-    - name: Install Nginx, PHP 7.4 and common PHP extensions
+    - name: Install Nginx, PHP 7.4 and common PHP extensions, and Prometheus Node Exporter
       ansible.builtin.apt:
         name:
           - nginx
@@ -25,12 +25,16 @@
           - php7.4-dom
           - php7.4-xmlrpc
           - php7.4-gd
+          - prometheus-node-exporter
         state: present
 
     - name: Create Nginx vhost
-      template:
+      ansible.builtin.copy:
         src: "app_server_nginx.conf"
         dest: "/etc/nginx/sites-enabled/app_server.conf"
+        owner: root
+        group: root
+        mode: 0644
 
     - name: Delete default Nginx vhost
       file:
@@ -38,7 +42,49 @@
         state: absent
       when: remove_default_nginx_vhost == true
 
+    - name: Create App Folder
+      ansible.builtin.file:
+        path: "/var/www/html/divistant-technical-test"
+        state: directory
+
+    - name: Deploy index.php
+      ansible.builtin.copy:
+        src: "../app/index.php"
+        dest: "/var/www/html/divistant-technical-test/index.php"
+        owner: root
+        group: root
+        mode: 0644
+
     - name: Reload nginx
       service:
         name: nginx
         state: reloaded
+
+    - name: Restart PHP
+      service:
+        name: php7.4-fpm
+        state: restarted
+
+    - name: Create Script and Backup Folder
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - /root/scripts
+        - /root/backup
+
+    - name: Create Backup Script
+      ansible.builtin.copy:
+        src: "backup-app.sh"
+        dest: "/root/scripts/backup-app.sh"
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Change Permission on Backup Script
+      ansible.builtin.file:
+        path: /root/scripts/backup-app.sh
+        state: file
+        owner: root
+        group: root
+        mode: 0755
