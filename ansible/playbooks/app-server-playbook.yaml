@@ -49,7 +49,7 @@
 
     - name: Deploy index.php
       ansible.builtin.copy:
-        src: "../app/index.php"
+        src: "index.php"
         dest: "/var/www/html/divistant-technical-test/index.php"
         owner: root
         group: root
