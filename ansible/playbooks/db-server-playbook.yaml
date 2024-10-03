@@ -21,12 +21,12 @@
     - name: Enable MySQL
       ansible.builtin.service:
         name: mysql
-        state: enabled
+        enabled: yes
 
-    - name: Replace IP Address
+    - name: Replace Bind IP Address
       ansible.builtin.lineinfile:
         path: /etc/mysql/mysql.conf.d/mysqld.cnf
-        search_string: '127.0.0.1'
+        regexp: '^127\.0\.0\.1'
         line: 192.168.0.2
         owner: root
         group: root
